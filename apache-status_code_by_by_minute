@@ -1,0 +1,55 @@
+import logparser
+
+logfile = open('apache_logs','r')
+
+statuscounter = {}
+
+for logline in logfile:
+
+    logparts = logparser.parser(logline)
+
+    status = logparts['status']
+    date = logparts['time'][0:11]
+    hour = logparts['time'][12:14]
+    minute = logparts['time'][15:17]
+
+    if date not in statuscounter:
+
+        statuscounter[date] = {hour:{minute:{status:1}}}
+
+    else:
+
+        if hour not in statuscounter[date]:
+
+            statuscounter[date][hour] = {minute:{status:1}}
+            
+        else:
+
+            if minute not in statuscounter[date][hour]:
+
+                
+              statuscounter[date][hour][minute] = {status:1}
+
+            else:
+
+                if status not in statuscounter[date][hour]:
+
+                    statuscounter[date][hour][minute][status] = 1
+                
+                else:
+
+                   statuscounter[date][hour][minute][status] += 1
+
+logfile.close()
+
+for date in statuscounter:
+
+    print(f'{date}')
+    
+    for hour in statuscounter[date]:
+    
+        print(f'Hour: {hour}')
+
+        for minute in statuscounter[date][hour]:
+
+            print(f'Minute: {minute}  Hits:  {statuscounter[date][hour][minute]}')
